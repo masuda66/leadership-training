@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>リーダーシップ研修ダッシュボード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f4f4f1; --surface:#fcfcfb; --surface2:#f3f2ee;
+  --ink:#1d1d1b; --ink2:#52514e; --muted:#6f6d68;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
+  --accent:#2f5f8a; --pos:#006300; --neg:#b03535;
+  --s1:#2a78d6; --s2:#eb6834;
+  --q1:#104281; --q2:#1c5cab; --q3:#2a78d6; --q4:#5598e7; --q5:#86b6ef;
+  --dL2:#1c5cab; --dL1:#86b6ef; --dM:#c3c2b7; --dH1:#ef9f9e; --dH2:#c63a39;
+  --shadow:0 1px 2px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#0f0f0e; --surface:#1a1a19; --surface2:#222220;
+    --ink:#f0efec; --ink2:#c3c2b7; --muted:#9a988f;
+    --grid:#2c2c2a; --axis:#45443f; --border:rgba(255,255,255,.10);
+    --accent:#8fb6dd; --pos:#3cbf3c; --neg:#ec7c7c;
+    --s1:#3987e5; --s2:#d95926;
+    --q1:#9ec5f4; --q2:#6da7ec; --q3:#3987e5; --q4:#256abf; --q5:#184f95;
+    --dL2:#6da7ec; --dL1:#2d5f9e; --dM:#5b5a55; --dH1:#9a3b3b; --dH2:#e66767;
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0f0f0e; --surface:#1a1a19; --surface2:#222220;
+  --ink:#f0efec; --ink2:#c3c2b7; --muted:#9a988f;
+  --grid:#2c2c2a; --axis:#45443f; --border:rgba(255,255,255,.10);
+  --accent:#8fb6dd; --pos:#3cbf3c; --neg:#ec7c7c;
+  --s1:#3987e5; --s2:#d95926;
+  --q1:#9ec5f4; --q2:#6da7ec; --q3:#3987e5; --q4:#256abf; --q5:#184f95;
+  --dL2:#6da7ec; --dL1:#2d5f9e; --dM:#5b5a55; --dH1:#9a3b3b; --dH2:#e66767;
+  --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Sans JP",system-ui,-apple-system,"Hiragino Sans","Yu Gothic UI",sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px 48px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 16px;padding:24px 0 12px}
+h1{font-size:22px;font-weight:700;margin:0;letter-spacing:.02em}
+.sub{color:var(--ink2);font-size:13px;margin-top:2px}
+.hdr-right{display:flex;align-items:center;gap:12px;color:var(--ink2);font-size:13px}
+.btn{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer}
+.btn:hover{background:var(--surface2)}
+.btn:focus-visible,select:focus-visible,th button:focus-visible{outline:2px solid var(--s1);outline-offset:1px}
+
+.filters{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 0 10px;border-bottom:1px solid var(--border)}
+.frow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end}
+.fgroup{display:flex;flex-direction:column;gap:2px;min-width:0}
+.fgroup label{font-size:11.5px;color:var(--muted)}
+select{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 28px 6px 10px;max-width:190px;appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 55%,calc(100% - 10px) 55%;background-size:5px 5px;background-repeat:no-repeat}
+select.active{border-color:var(--s1);box-shadow:0 0 0 1px var(--s1) inset}
+.fmeta{display:flex;align-items:center;gap:12px;margin-left:auto}
+.count{font-size:14px;color:var(--ink2);white-space:nowrap}
+.count b{font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums}
+.fnote{font-size:11.5px;color:var(--muted);margin-top:6px}
+
+section{margin-top:28px}
+h2{font-size:16px;font-weight:700;margin:0 0 4px}
+.secdesc{color:var(--ink2);font-size:12.5px;margin:0 0 12px}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(5,minmax(0,1fr))}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:1000px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){.filters{position:static}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.g2,.g3{grid-template-columns:1fr}.fmeta{margin-left:0;width:100%;justify-content:space-between}select{max-width:none;width:100%}.fgroup{flex:1 1 140px}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);min-width:0}
+.card h3{font-size:13.5px;font-weight:700;margin:0 0 2px}
+.card .cdesc{font-size:11.5px;color:var(--muted);margin:0 0 10px}
+.span2{grid-column:span 2}
+@media (max-width:720px){.span2{grid-column:auto}}
+
+.kpi .kl{font-size:12px;color:var(--ink2)}
+.kpi .kv{font-size:28px;font-weight:700;line-height:1.25;margin-top:4px}
+.kpi .kv small{font-size:13px;font-weight:500;color:var(--ink2);margin-left:2px}
+.kpi .kd{font-size:12px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+.up{color:var(--pos)} .down{color:var(--neg)}
+
+/* bars */
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--ink2);margin-bottom:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.brow{display:grid;grid-template-columns:minmax(0,var(--lw,150px)) minmax(0,1fr) auto;align-items:center;gap:4px 10px;padding:3px 0}
+.blabel{font-size:12.5px;color:var(--ink);overflow-wrap:anywhere;line-height:1.35}
+.blabel .n{color:var(--muted);font-size:11.5px;white-space:nowrap}
+.track{position:relative;height:16px;cursor:default}
+.track::before{content:"";position:absolute;left:0;top:-3px;bottom:-3px;border-left:1px solid var(--axis)}
+.bar{position:absolute;left:0;top:2px;height:12px;border-radius:0 4px 4px 0;min-width:1px}
+.bval{font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right;min-width:72px}
+.bgroup{padding:6px 0;border-bottom:1px solid var(--grid)}
+.bgroup:last-child{border-bottom:0}
+.bgroup .gl{font-size:12.5px;margin-bottom:2px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.gl .diff{font-variant-numeric:tabular-nums;font-size:12px;color:var(--ink2);white-space:nowrap}
+.sbrow{display:grid;grid-template-columns:86px minmax(0,1fr) 44px;align-items:center;gap:8px;padding:1px 0}
+.sbrow .sl{font-size:11.5px;color:var(--muted)}
+.sbrow .track{height:12px}
+.sbrow .bar{top:1px;height:10px}
+.faded{opacity:.4}
+.tag{display:inline-block;font-size:10.5px;padding:0 6px;border-radius:999px;border:1px solid var(--axis);color:var(--ink2);margin-left:6px;white-space:nowrap}
+.insufficient{font-size:12px;color:var(--muted);padding-left:8px;border-left:1px dashed var(--axis);line-height:16px}
+.foot{font-size:11.5px;color:var(--muted);margin-top:8px}
+.caution{margin-top:12px;font-size:12px;color:var(--ink2);background:var(--surface2);border-left:3px solid var(--axis);padding:8px 12px;border-radius:0 8px 8px 0}
+.empty{color:var(--muted);font-size:13px;padding:16px 0}
+
+/* donut */
+.donutwrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.donutwrap svg{flex:0 0 auto}
+.dlegend{font-size:12.5px;display:flex;flex-direction:column;gap:6px}
+.dlegend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.dlegend .v{color:var(--ink2);font-variant-numeric:tabular-nums;margin-left:4px}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-bottom:8px;font-size:12px;color:var(--ink2)}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.seg button{font:inherit;font-size:12px;border:0;background:var(--surface);color:var(--ink2);padding:4px 10px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--border)}
+.seg button[aria-pressed="true"]{background:var(--surface2);color:var(--ink);font-weight:700}
+
+/* tables */
+.tscroll{overflow:auto;max-height:620px;border:1px solid var(--border);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--grid);text-align:left;vertical-align:top}
+thead th{position:sticky;top:0;background:var(--surface2);z-index:1;font-weight:700;white-space:nowrap}
+th button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;display:inline-flex;gap:4px;align-items:center}
+th .arr{color:var(--muted);font-size:10px;width:10px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+#detail td{white-space:nowrap}
+#detail td.free{white-space:pre-wrap;min-width:220px;max-width:340px;color:var(--ink)}
+td.na{color:var(--muted)}
+tbody tr:hover td{background:var(--surface2)}
+.ctable td,.ctable th{padding:6px 8px}
+.rbar{position:relative;height:12px;min-width:120px}
+.rbar .mid{position:absolute;left:50%;top:-2px;bottom:-2px;border-left:1px solid var(--axis)}
+.rbar .b{position:absolute;top:1px;height:10px;border-radius:3px}
+
+#tip{position:fixed;pointer-events:none;z-index:50;background:var(--ink);color:var(--surface);font-size:12px;line-height:1.5;padding:6px 9px;border-radius:6px;max-width:260px;opacity:0;transition:opacity .08s;font-variant-numeric:tabular-nums}
+#tip.on{opacity:1}
+[data-tip]{cursor:default}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>リーダーシップ研修ダッシュボード</h1>
+      <div class="sub">受講後アンケート集計　<span id="surveyDate"></span></div>
+    </div>
+    <div class="hdr-right">
+      <button class="btn" id="themeBtn" type="button" aria-label="表示テーマを切り替え">テーマ：自動</button>
+    </div>
+  </header>
+
+  <div class="filters" role="region" aria-label="絞り込み条件">
+    <div class="frow" id="filterRow"></div>
+    <div class="fnote">※ 部門以外の属性が空欄（#N/A）の回答者は、その属性で絞り込むと表示対象から外れます。プルダウンの件数は、他の絞り込み条件を反映した人数です。</div>
+  </div>
+
+  <section aria-labelledby="h-kpi">
+    <h2 id="h-kpi" class="sr" style="position:absolute;left:-9999px">主要指標</h2>
+    <div class="grid kpis" id="kpis"></div>
+  </section>
+
+  <section aria-labelledby="h-eval">
+    <h2 id="h-eval">研修評価</h2>
+    <p class="secdesc">活用率 ＝「活用した」÷（「活用した」＋「活用していない」）。未回答は分母から除き、人数を別に表示しています。</p>
+    <div class="grid g2">
+      <div class="card span2">
+        <h3>部門別の平均（満足度・講師評価）</h3>
+        <p class="cdesc">いずれも5点満点。部門名の横は表示中の回答者数。</p>
+        <div class="legend"><span><i style="background:var(--s1)"></i>満足度</span><span><i style="background:var(--s2)"></i>講師評価</span></div>
+        <div id="deptChart"></div>
+      </div>
+      <div class="card"><h3>研修の必要度</h3><p class="cdesc">件数（%）。分母は表示中の回答者数。</p><div id="distNeed"></div><div class="foot" id="noteNeed"></div></div>
+      <div class="card"><h3>研修の有用度</h3><p class="cdesc">件数（%）。分母は表示中の回答者数。</p><div id="distUseful"></div><div class="foot" id="noteUseful"></div></div>
+      <div class="card"><h3>研修内容のレベル</h3><p class="cdesc">件数（%）。中央（グレー）が「ちょうどいい」。</p><div id="distLevel"></div></div>
+      <div class="card"><h3>研修時間</h3><p class="cdesc">件数（%）。中央（グレー）が「ちょうどいい」。</p><div id="distTime"></div></div>
+      <div class="card"><h3>研修内容の活用状況</h3><p class="cdesc">活用率は有効回答（活用した＋活用していない）が分母。</p><div id="donut"></div></div>
+      <div class="card"><h3>活用結果の程度</h3><p class="cdesc">分母は「活用した」と回答した人のみ。</p><div id="distDeg"></div></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-eng">
+    <h2 id="h-eng">職場エンゲージメント</h2>
+    <p class="secdesc">研修の活用状況と職場環境に関する回答の対応関係（各設問は5段階）。</p>
+    <div class="grid g2">
+      <div class="card">
+        <h3>A. 設問別の平均</h3>
+        <p class="cdesc">表示中の回答者の平均（5点満点）を高い順に表示。</p>
+        <div id="engAvg"></div>
+      </div>
+      <div class="card">
+        <h3>B. 活用有無別のエンゲージメント</h3>
+        <p class="cdesc">設問ごとに「活用した」「活用していない」の平均を表示。差＝活用した − 活用していない。</p>
+        <div class="toolbar"><span>並び順</span>
+          <div class="seg" id="sortB" role="group" aria-label="並び順">
+            <button type="button" data-v="q" aria-pressed="true">設問順</button>
+            <button type="button" data-v="d" aria-pressed="false">差の大きい順</button>
+          </div>
+        </div>
+        <div class="legend" id="legB"></div>
+        <div id="engByUse"></div>
+        <div class="caution">横断的な1回の調査の比較であり、因果関係を示すものではありません。<br>n が小さい群の差は偶然の可能性があります。</div>
+      </div>
+      <div class="card">
+        <h3>C. 設問の回答水準別の活用率</h3>
+        <p class="cdesc">選んだ設問の回答を 低（1–2）・中（3）・高（4–5）に分け、群ごとの活用率を表示。n は活用有無の有効回答数。n&lt;10 は薄色で「参考値（少数）」、n&lt;5 は「n不足」。</p>
+        <div class="toolbar"><label for="selC">設問</label>
+          <select id="selC" style="max-width:100%"></select>
+        </div>
+        <div id="engLevel"></div>
+        <div class="caution">横断的な1回の調査の比較であり、因果関係を示すものではありません。<br>n が小さい群の差は偶然の可能性があります。</div>
+      </div>
+      <div class="card">
+        <h3>D. 活用有無との相関係数</h3>
+        <p class="cdesc">「活用した=1／活用していない=0」との相関係数（点双列相関＝ピアソンの r）。活用有無が未回答の人は除外。</p>
+        <div id="corrTable"></div>
+        <div class="caution">横断的な1回の調査の比較であり、因果関係を示すものではありません。<br>n が小さい群の差は偶然の可能性があります。</div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-tbl">
+    <h2 id="h-tbl">回答詳細</h2>
+    <p class="secdesc">列見出しをクリックすると並び替えます。自由記述は原文のまま表示しています（活用有無と内容が食い違うように読める回答も、加工していません）。</p>
+    <div class="tscroll"><table id="detail"></table></div>
+  </section>
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script>
+/* ===== 設定 ===== */
+// 調査実施日：固定値で表示（閲覧日は使わない）。例：'2026年8月10日'。不明な場合は null のまま。
+const SURVEY_DATE = null;
+
+/* ===== データ（受講後アンケート 99名）=====
+   列順：部門,職位,性別,年代,採用区分,必要度,レベル,有用度,講師評価,研修時間,満足度,活用有無(used/not/null),活用結果の程度,結果の内容,E1..E6 */
+const RAW = [["管理（その他）","一般職","男性",20,"新卒採用","必要性を感じる","ちょうどいい","今後役立つものである",5,"ちょうどいい",2,null,null,null,3,2,3,3,3,3],["管理（その他）","管理職","男性",40,"中途採用","必要性を感じる","ちょうどいい","普通",4,"ちょうどいい",2,"used","ある程度の結果が出た","チームメンバーとのやり取りがスムーズになった",3,2,3,2,2,4],["管理（その他）","チームリーダー","女性",40,"新卒採用","必要性を感じる","ちょうどいい","今後役立つものである",3,"ちょうどいい",3,"not",null,"多忙な業務が続き、実践に移す余裕がなかった。",4,3,4,4,3,4],["技術","チームリーダー","男性",30,"新卒採用","強く必要性を感じる","ちょうどいい","今後役立つものである",4,"長い",2,"used","良い結果が出た","相手の本音を引き出そうと問いかけているが、思うようにいかない。\n掘り下げると相手が言葉に詰まってしまい、結局こちらの考えを示すことになり、その指示どおりに動くだけになりがちである。",3,4,3,4,5,4],["製造","管理職","男性",40,"新卒採用","必要性を感じる","ちょうどいい","今後役立つものである",5,"ちょうどいい",2,"not",null,"学んだ内容を見直す時間が取れず、実践には結びつかなかった。",5,4,4,3,2,4],["開発","一般職","女性",30,"中途採用","強く必要性を感じる","ちょうどいい","今後役立つものである",4,"ちょうどいい",5,"used","少しだけ結果が出た","従来に比べ、意思疎通がスムーズに行えるようになりました。",4,4,4,4,2,2],["技術","チームリーダー","男性",30,"新卒採用","必要性を感じる","ちょうどいい","非常に今後役立つものである",3,"長い",5,"used","非常に良い結果が出た","状況を細かく確認する場面で役に立った",4,4,4,3,4,5],["管理（その他）","管理職","男性",40,"新卒採用","強く必要性を感じる","ちょうどいい","あまり役立たない",5,"ちょうどいい",3,"used","ある程度の結果が出た","聞いた内容を自分なりに要約し、相手に確かめる習慣が身についた",5,3,4,4,3,4],["管理（その他）","管理職","男性",40,"新卒採用","強く必要性を感じる","ちょうどいい","今後役立つものである",5,"ちょうどいい",3,"used","ある程度の結果が出た","GROWモデルや各段階のねらい・質問の例は、受講中は使えそうだと感じていたものの、終了後は意識が薄れ実際には使えていませんでした。今回改めて内容を見直せたので、これから試してみたいと思います。",4,2,2,2,4,2],["開発","一般職","男性",40,"中途採用","必要性を感じる","ちょうどいい","非常に今後役立つものである",4,"長い",5,"not",null,"担当業務に追われ、試す時間を確保できなかった。",4,3,4,3,3,4],["開発","チームリーダー","男性",40,"中途採用","必要性を感じる","ちょうどいい","今後役立つものである",4,"ちょうどいい",4,"not",null,"担当プロジェクトが立て込み、実践に着手できなかった。",5,4,4,3,3,4],["開発","一般職","男性",30,"新卒採用","必要性を感じる","ちょうどいい","普通",4,"ちょうどいい",5,"used","ある程度の結果が出た","相手の意図をつかみやすくなり、その場で不明点を尋ねることが多くなった。",4,3,4,3,2,2],["管理（その他）","管理職","男性",40,"中途採用","強く必要性を感じる","ちょうどいい","今後役立つものである",5,"ちょうどいい",4,"not",null,"受講内容を復習する場がなく、実務での実践までは進まなかった。",4,4,1,4,5,4],["技術","チームリーダー","男性",30,"新卒採用","必要性を感じる","ちょうどいい","今後役立つものである",4,"ちょうどいい",4,null,null,null,4,4,3,3,3,4],["開発","管理職","男性",40,"新卒採用","必要性を感じる","ちょうどいい","今後役立つものである",3,"ちょうどいい",2,"not",null,"面談などの機会が期間内になく、試すところまで進まなかった。",2,2,4,1,3,3],["技術","管理職","男性",50,"新卒採用","必要性を感じる","難しい","あまり役立たない",4,"ちょうどいい",5,"used","少しだけ結果が出た","相手を理解しようと心がけ、耳を傾けながら面接に臨んだ。",4,4,4,4,2,1],["開発","一般職","女性",30,"新卒採用","強く必要性を感じる","ちょうどいい","非常に今後役立つものである",5,"ちょうどいい",5,"not",null,"内容を思い返す機会に恵まれず、行動に移せなかった。",4,4,4,4,4,4],["開発","チームリーダー","男性",30,"新卒採用","必要性を感じる","ちょうどいい","今後役立つものである",5,"ちょうどいい",4,"used","少しだけ結果が出た","はじめに相手を受け止める構えで向き合うようにしたことで意思疎通がスムーズになり、双方が信頼し合いながら業務に取り組めていると感じます。",5,4,3,3,1,2],["開発","チームリーダー","男性",30,"新卒採用","強く必要性を感じる","難しい","あまり役立たない",4,"ちょうどいい",4,"used","少しだけ結果が出た","研修の内容を覚えておらず、実際に使えているのか判断できません。恐れ入ります。",3,5,5,4,1,4],["開発","チームリーダー","男性",30,"新卒採用","強く必要性を感じる","ちょうどいい","非常に今後役立つものである",5,"ちょうどいい",4,"not",null,"繁忙な状況が重なり、実行に移す機会を得られなかった。",5,3,5,4,3,4],["開発","チームリーダー","男性",30,"中途採用","強く必要性を感じる","ちょうどいい","あまり役立たない",5,"長い",2,"used","ごくわずかだが結果が出た","プロジェクトメンバーとの議論の場で用い、課題に関する情報の整理や対応策の検討をスムーズに進められた。",5,3,5,4,2,2],["製造","チームリーダー","男性",30,"新卒採用","必要性を感じる","ちょうどいい","普通",5,"ちょうどいい",4,"used","ある程度の結果が出た","目標管理の一次評価者として目標設定の面談を行った際、本人が今期取り組みたいと考えている内容をしっかり引き出せたと感じています。あわせて、進め方についての助言も添えられたと思います。",5,4,4,3,3,4],["製造","チームリーダー","男性",40,"中途採用","強く必要性を感じる","ちょうどいい","普通",3,"短い",3,"used","少しだけ結果が出た","仕事上でも仕事以外でも話す回数が増え、仕事の進み方も速くなった実感がある。",5,3,4,4,1,2],["開発","チームリーダー","男性",30,"新卒採用","強く必要性を感じる","難しい","今後役立つものである",4,"ちょうどいい",5,"used","良い結果が出た","成果と言えるものではないが、評価面談などの場で学んだ点を念頭に置いて臨めた。",5,5,4,4,4,5],["技術","一般職","男性",20,"新卒採用","強く必要性を感じる","難しい","非常に今後役立つものである",5,"ちょうどいい",5,null,null,null,2,3,2,4,1,5],["技術","チームリーダー","男性",30,"新卒採用","強く必要性を感じる","ちょうどいい","あまり役立たない",5,"ちょうどいい",3,null,null,null,3,4,3,1,2,3],["技術","チームリーダー","男性",30,"新卒採用","必要性を感じる","ちょうどいい","普通",5,"ちょうどいい",4,"used","ごくわずかだが結果が出た","現地メンバーが抱える現場の問題や、顧客側の内部の事情などを一部教えてもらえ、価値のある情報を得られた。",5,5,2,3,1,3],["営業","チームリーダー","男性",30,"新卒採用","必要性を感じる","難しい","普通",5,"長い",4,"used","ある程度の結果が出た","これまで慣習や決まりとして従っていた事柄について、その必要性を言葉で説明できるようになってきた。",5,5,5,5,2,3],["製造","チームリーダー","男性",30,"新卒採用","強く必要性を感じる","ちょうどいい","今後役立つものである",4,"長い",5,null,null,null,4,4,4,4,3,4],["技術",null,null,null,null,"なんともいえない","非常にやさしい","普通",4,"非常に長い",3,null,null,null,5,4,2,1,5,2],["技術","チームリーダー","男性",30,"新卒採用","強く必要性を感じる","ちょうどいい","普通",5,"ちょうどいい",4,"used","少しだけ結果が出た","・昇級試験の面接での応答に生かすことができ、試験に合格できた\n・後輩と関わる際に心がけており、スムーズな意思疎通ができている",5,4,4,4,3,4],["開発","管理職","男性",40,"新卒採用","必要性を感じる","ちょうどいい","普通",3,"長い",5,"used","少しだけ結果が出た","発言する前に一度考えを整理してから話すようになった。",5,4,4,4,2,2],["管理（その他）","チームリーダー","男性",30,"新卒採用","強く必要性を感じる","難しい","非常に今後役立つものである",2,"長い",3,null,null,null,4,2,4,3,3,3],["管理（その他）","管理職","女性",50,"新卒採用","必要性を感じる","ちょうどいい","普通",4,"ちょうどいい",5,"used","少しだけ結果が出た","メンバーとの意思疎通がわずかながら良くなってきている。",1,3,4,3,3,1],["開発","管理職","男性",40,"中途採用","必要性を感じる","ちょうどいい","非常に今後役立つものである",4,"長い",5,"used","良い結果が出た","使う場面がそれほど多くないため成果の有無は測りにくいのですが、\nコーチングを踏まえた問いかけの引き出しが増えたこと自体に意義があったと考えています",3,2,5,4,4,4],["技術","チームリーダー","男性",30,"新卒採用","必要性を感じる","ちょうどいい","今後役立つものである",4,"ちょうどいい",3,null,null,null,3,4,2,2,3,3],["技術","チームリーダー","男性",30,"中途採用","強く必要性を感じる","ちょうどいい","今後役立つものである",2,"ちょうどいい",2,null,null,null,3,1,5,4,1,4],["開発","一般職","男性",50,"新卒採用","強く必要性を感じる","ちょうどいい","今後役立つものである",5,"ちょうどいい",5,"not",null,"部下を抱える役職ではないため、生かす場がなかった。",5,5,4,4,3,5],["技術","チームリーダー","男性",50,"新卒採用","強く必要性を感じる","ちょうどいい","非常に今後役立つものである",5,"非常に長い",5,null,null,null,4,4,3,4,2,3],["技術","管理職","男性",50,"新卒採用","必要性を感じる","ちょうどいい","非常に今後役立つものである",4,"長い",2,null,null,null,5,4,3,5,3,2],["管理（その他）","チームリーダー","男性",30,"中途採用","必要性を感じる","ちょうどいい","あまり役立たない",4,"長い",4,"used","少しだけ結果が出た","相手が話しやすい雰囲気をつくり、その考えを引き出せるようになったことで、より踏み込んだ議論ができるようになった。",5,4,5,3,2,4],["開発",null,null,null,null,"強く必要性を感じる","難しい","非常に今後役立つものである",4,"ちょうどいい",4,null,null,null,1,4,1,5,2,2],["開発","一般職","男性",30,"新卒採用","必要性を感じる","ちょうどいい","普通",2,"ちょうどいい",4,"used","少しだけ結果が出た","コーチングとティーチングを場面に応じて選ぶことで、自分自身の考えも整理できた。\nチームメンバーとより的確に話せているように感じる。",5,3,5,4,3,3],["管理（その他）","一般職","女性",20,"中途採用","強く必要性を感じる","ちょうどいい","非常に今後役立つものである",4,"ちょうどいい",5,"not",null,"部下のいない立場であり、実際に用いる場面がなかった。",4,2,2,3,3,5],["開発","チームリーダー","男性",30,"新卒採用","強く必要性を感じる","ちょうどいい","今後役立つものである",4,"ちょうどいい",4,null,null,null,5,4,4,3,3,4],["技術","一般職","女性",20,"新卒採用","必要性を感じる","ちょうどいい","非常に今後役立つものである",5,"ちょうどいい",2,"used","非常に良い結果が出た","後輩の質問について、本当に知りたい点をつかめるようになってきた。\nその結果、後輩が出す成果物の精度も上がってきた。",5,3,3,4,4,5],["製造","管理職","男性",40,"中途採用","必要性を感じる","難しい","今後役立つものである",4,"長い",3,null,null,null,4,4,3,3,2,3],["製造","管理職","男性",50,"新卒採用","必要性を感じる","ちょうどいい","非常に今後役立つものである",3,"ちょうどいい",5,"used","非常に良い結果が出た","課題を設定して問題を解決する場面で、部下への接し方が変化した。",3,2,3,3,4,3],["技術","管理職","男性",50,"新卒採用","必要性を感じる","難しい","非常に今後役立つものである",4,"長い",4,"not",null,"業務量が多く、実際に試す時間を取れなかった。",4,4,4,3,3,4],["製造","一般職","男性",20,"新卒採用","必要性を感じる","難しい","非常に今後役立つものである",5,"ちょうどいい",2,"used","良い結果が出た","後輩の考えや意見を引き出すこと",4,4,4,4,5,3],["管理（その他）","管理職","男性",40,"新卒採用","必要性を感じる","ちょうどいい","普通",5,"ちょうどいい",2,"used","ある程度の結果が出た","部下とのやり取りがスムーズになった。",4,4,4,4,2,3],["開発","チームリーダー","男性",40,"新卒採用","なんともいえない","ちょうどいい","非常に今後役立つものである",5,"ちょうどいい",4,"used","ある程度の結果が出た","異動先のメンバーと短期間で打ち解けることができています。",4,4,3,3,1,2],["開発","チームリーダー","男性",30,"新卒採用","強く必要性を感じる","ちょうどいい","非常に今後役立つものである",5,"ちょうどいい",4,"not",null,"仕事が立て込んでおり、実践の機会をつくれなかった。",4,4,4,4,4,4],["開発","チームリーダー","男性",30,"新卒採用","なんともいえない","ちょうどいい","あまり役立たない",4,"長い",5,"used","ある程度の結果が出た","部下と話す際に意識して接するようにしたことで、以前よりやり取りがスムーズになった",4,4,4,3,1,4],["技術","管理職","男性",50,"新卒採用","強く必要性を感じる","ちょうどいい","非常に今後役立つものである",5,"短い",5,null,null,null,4,4,3,4,3,5],["開発","管理職","男性",40,"中途採用","必要性を感じる","ちょうどいい","今後役立つものである",4,"ちょうどいい",4,"not",null,"学びを見返す機会がないまま、実践までは至らなかった。",4,3,5,4,3,4],["製造","一般職","男性",30,"新卒採用","強く必要性を感じる","ちょうどいい","非常に今後役立つものである",5,"ちょうどいい",3,null,null,null,5,3,4,4,2,4],["開発","チームリーダー","男性",30,"新卒採用","強く必要性を感じる","難しい","今後役立つものである",5,"ちょうどいい",3,"used","良い結果が出た","相手の話に丁寧に耳を傾けるよう心がけたことで、ふだん自分の考えをあまり口にしなかった部下からも発言が出るようになってきた。ティーチングとコーチングの違いを正しく理解できたため、ティーチングでは自分が伝えるべき要点を確実に示し、コーチングでは相手が話したい流れに沿わせるという形で、納得感のある会話ができるようになってきた。",5,4,4,4,5,3],["技術","一般職","女性",20,"新卒採用","強く必要性を感じる","ちょうどいい","非常に今後役立つものである",5,"ちょうどいい",3,"used","良い結果が出た","研修での学びを活かして部内の意見を集約し、社内コンペであるGA-DXアワードで受賞することができました。",4,4,3,4,5,4],["技術","管理職","男性",40,"新卒採用","必要性を感じる","ちょうどいい","普通",5,"ちょうどいい",3,"used","ある程度の結果が出た","グループリーダーにコーチングを行ったところ、本人の仕事への姿勢が前向きに変わり、効果を実感できた。",4,4,4,3,1,4],["管理（その他）","一般職","女性",20,"新卒採用","必要性を感じる","やさしい","今後役立つものである",3,"ちょうどいい",3,"not",null,"内容を復習する時間が取れず、実行に移せなかった。",4,4,4,3,4,4],["製造","管理職","男性",60,"新卒採用","強く必要性を感じる","ちょうどいい","非常に今後役立つものである",5,"ちょうどいい",4,"not",null,"異動直後で新しい環境に慣れることが先になり、実践できなかった。",4,3,3,3,3,3],["開発","チームリーダー","男性",30,"新卒採用","強く必要性を感じる","ちょうどいい","非常に今後役立つものである",4,"ちょうどいい",4,null,null,null,4,3,4,3,3,4],["技術","一般職","女性",20,"新卒採用","強く必要性を感じる","ちょうどいい","非常に今後役立つものである",5,"ちょうどいい",4,"not",null,"研修を振り返る余裕がなく、実務での活用にはつながらなかった。",4,4,5,4,4,5],["管理（その他）","チームリーダー","男性",30,"中途採用","必要性を感じる","ちょうどいい","今後役立つものである",4,"ちょうどいい",3,"not",null,"学んだことを見直す機会がなく、実践には結びつかなかった。",2,5,4,1,2,1],["営業","管理職","男性",40,"新卒採用","必要性を感じる","難しい","今後役立つものである",3,"長い",2,"not",null,"他部署との調整業務が重なり、実践の時間を確保できなかった。",2,5,5,3,3,5],["営業","一般職","女性",20,"中途採用","なんともいえない","非常にやさしい","普通",3,"非常に長い",5,"not",null,"部下を持つ役割ではないので、実践する場が生じなかった。",4,5,1,5,3,1],["営業","チームリーダー","女性",50,"新卒採用","必要性を感じる","非常にやさしい","あまり役立たない",4,"非常に短い",2,"not",null,"内容を確認し直す場がなく、実際に行動へ移せなかった。",2,5,1,3,5,4],["営業","管理職","男性",60,"新卒採用","あまり必要性を感じない","非常に難しい","あまり役立たない",5,"非常に短い",4,"used","少しだけ結果が出た","話を丁寧に聴くよう心がけた結果、相談を受ける回数が増えた。",4,3,4,3,3,2],["サービス","一般職","女性",30,"新卒採用","なんともいえない","ちょうどいい","あまり役立たない",4,"非常に長い",4,"used","ごくわずかだが結果が出た","耳を傾ける姿勢を意識したことで、持ち込まれる相談が多くなった。",4,4,5,4,1,1],["技術","管理職","女性",50,"新卒採用","強く必要性を感じる","ちょうどいい","あまり役立たない",2,"非常に短い",4,"used","ごくわずかだが結果が出た","部下との1on1において、本人の考えを引き出せるようになった。",4,3,3,1,2,1],["管理（その他）","一般職","男性",20,"中途採用","強く必要性を感じる","ちょうどいい","今後役立つものである",2,"非常に長い",5,"used","ある程度の結果が出た","傾聴を心がけたところ、声をかけられる相談の数が増加した。",4,1,3,3,3,2],["営業","一般職","女性",20,"中途採用","なんともいえない","非常にやさしい","非常に今後役立つものである",3,"短い",4,"not",null,"日々の業務に追われ、実践に取り組む機会がなかった。",4,4,1,2,5,1],["製造","一般職","女性",20,"新卒採用","強く必要性を感じる","非常に難しい","非常に今後役立つものである",2,"短い",2,"not",null,"部下を持つ立場になく、実務で使う場面がなかった。",5,3,5,1,1,1],["製造","一般職","女性",20,"新卒採用","なんともいえない","やさしい","今後役立つものである",2,"短い",4,"used","ある程度の結果が出た","顧客との打ち合わせで、要望を整理する作業がしやすくなった。",3,1,2,2,3,3],["サービス","一般職","女性",40,"新卒採用","あまり必要性を感じない","難しい","普通",2,"非常に短い",2,"used","ごくわずかだが結果が出た","取引先との打ち合わせにおいて、要望の整理がスムーズになった。",1,2,2,5,1,2],["開発","管理職","男性",50,"中途採用","強く必要性を感じる","やさしい","あまり役立たない",2,"短い",2,"used","ある程度の結果が出た","会議をスムーズに進められるようになり、結論に至るまでの時間が縮まった。",2,1,2,5,3,3],["製造","管理職","女性",50,"新卒採用","なんともいえない","非常に難しい","非常に今後役立つものである",4,"長い",2,"not",null,"業務が立て込んでいたため、実践する余地がなかった。",2,2,5,2,5,2],["サービス","管理職","男性",60,"中途採用","なんともいえない","ちょうどいい","普通",2,"長い",4,"not",null,"会議や出張が続き、学んだ内容を試す余裕がなかった。",4,2,3,4,3,5],["管理（その他）","一般職","女性",30,"新卒採用","あまり必要性を感じない","非常に難しい","今後役立つものである",4,"短い",2,"not",null,"自分の担当作業に手一杯で、実践する場をつくれなかった。",1,1,4,4,4,3],["サービス","チームリーダー","男性",60,"新卒採用","強く必要性を感じる","非常にやさしい","今後役立つものである",2,"短い",4,"used","少しだけ結果が出た","後輩を指導する場面で、答えを示さず本人に考えさせる対応がとれた。",5,3,1,4,2,2],["サービス","管理職","女性",40,"中途採用","強く必要性を感じる","難しい","普通",3,"短い",5,"used","ある程度の結果が出た","打ち合わせの進行が滑らかになり、結論を出すまでが早くなった。",2,4,2,3,5,4],["開発","管理職","男性",60,"新卒採用","必要性を感じる","やさしい","普通",3,"非常に短い",4,"used","少しだけ結果が出た","チーム内で情報のやり取りが活発になった。",4,4,2,2,2,2],["技術","一般職","男性",20,"中途採用","あまり必要性を感じない","非常に難しい","普通",2,"短い",3,"used","ごくわずかだが結果が出た","顧客との商談の場で、要望をまとめやすくなった。",5,3,4,1,1,1],["開発","一般職","女性",30,"新卒採用","なんともいえない","非常に難しい","非常に今後役立つものである",4,"短い",2,"not",null,"自身の担当業務への対応が優先となり、実践する機会がなかった。",4,2,5,4,4,5],["サービス","一般職","女性",30,"新卒採用","あまり必要性を感じない","やさしい","普通",5,"非常に短い",2,"used","少しだけ結果が出た","チーム内での情報の共有が以前より盛んになった。",3,2,4,4,2,2],["製造","一般職","男性",20,"新卒採用","なんともいえない","やさしい","普通",2,"短い",2,"used","ある程度の結果が出た","相手の話をよく聴くようにしたことで、相談される機会が増えた。",3,4,1,2,2,4],["技術","管理職","男性",50,"新卒採用","強く必要性を感じる","非常にやさしい","普通",4,"非常に短い",2,"not",null,"受講後に内容を見返す場がなく、実践までたどり着けなかった。",1,3,4,4,3,1],["営業","一般職","女性",40,"新卒採用","あまり必要性を感じない","難しい","非常に今後役立つものである",2,"非常に短い",3,"not",null,"学んだ内容を振り返る時間がなく、業務での実践に至らなかった。",4,3,3,5,5,1],["技術","チームリーダー","女性",60,"新卒採用","強く必要性を感じる","難しい","あまり役立たない",2,"長い",2,"not",null,"急な対応業務が続き、実践に踏み出せなかった。",2,3,4,2,3,5],["技術","一般職","男性",20,"新卒採用","あまり必要性を感じない","ちょうどいい","あまり役立たない",2,"長い",5,"used","ごくわずかだが結果が出た","お客様との打ち合わせで、ご要望を整理しやすくなった。",2,2,3,5,1,1],["開発","管理職","女性",60,"中途採用","あまり必要性を感じない","ちょうどいい","普通",4,"短い",2,"used","ある程度の結果が出た","顧客との協議の際に、要望点を整理する作業が楽になった。",5,1,3,2,2,4],["技術","一般職","女性",30,"新卒採用","必要性を感じる","ちょうどいい","あまり役立たない",2,"非常に長い",3,"not",null,"内容を思い返す機会がなく、実務への適用まで進まなかった。",1,2,3,3,1,4],["管理（その他）","管理職","女性",40,"新卒採用","強く必要性を感じる","難しい","あまり役立たない",3,"長い",2,"not",null,"手持ちの業務が多忙で、実践に充てる機会がなかった。",5,4,3,3,2,5],["管理（その他）","一般職","女性",30,"中途採用","必要性を感じる","やさしい","普通",2,"非常に短い",2,"used","少しだけ結果が出た","顧客との打ち合わせにおいて、要望の整理が容易になった。",5,3,4,1,1,3],["開発","管理職","女性",40,"新卒採用","なんともいえない","難しい","今後役立つものである",5,"非常に短い",3,"not",null,"期末の繁忙期と重なり、実践する機会を持てなかった。",5,3,3,5,4,2],["営業","管理職","男性",60,"中途採用","必要性を感じる","難しい","非常に今後役立つものである",2,"長い",4,"used","非常に良い結果が出た","部下と行う1on1の場で、相手の考えを聞き出せるようになった。",3,2,2,2,4,4],["製造","チームリーダー","男性",40,"新卒採用","なんともいえない","ちょうどいい","普通",4,"非常に短い",5,"used","ある程度の結果が出た","チーム内の情報共有が以前よりも活発化した。",4,1,2,5,1,3],["製造","一般職","男性",20,"新卒採用","強く必要性を感じる","非常にやさしい","非常に今後役立つものである",3,"ちょうどいい",3,"not",null,"研修を復習する機会がないまま、実践には移せなかった。",1,5,5,5,2,4]];
+
+const ENG = ['上司は重要な意思決定に自分を関与させてくれる','上司は部下の能力を伸ばしている','会社は社員の意見を十分に取り入れている','経営陣や上長に率直に発言できる','会社でのキャリアパスを描ける','会社に能力を伸ばす機会がある'];
+const DATA = RAW.map((r,i)=>({id:i+1,dept:r[0],pos:r[1],sex:r[2],age:r[3],hire:r[4],need:r[5],level:r[6],useful:r[7],inst:r[8],time:r[9],sat:r[10],use:r[11],deg:r[12],text:r[13],e:r.slice(14,20)}));
+const TOTAL = DATA.length;
+
+const NEED  = ['強く必要性を感じる','必要性を感じる','なんともいえない','あまり必要性を感じない','全く必要性を感じない'];
+const USEFUL= ['非常に今後役立つものである','今後役立つものである','普通','あまり役立たない','全く役立たない'];
+const LEVEL = ['非常にやさしい','やさしい','ちょうどいい','難しい','非常に難しい'];
+const TIME  = ['非常に短い','短い','ちょうどいい','長い','非常に長い'];
+const DEG   = ['非常に良い結果が出た','良い結果が出た','ある程度の結果が出た','少しだけ結果が出た','ごくわずかだが結果が出た'];
+const SEQ = ['var(--q1)','var(--q2)','var(--q3)','var(--q4)','var(--q5)'];
+const DIV = ['var(--dL2)','var(--dL1)','var(--dM)','var(--dH1)','var(--dH2)'];
+const USE_LABEL = {used:'活用した', not:'活用していない'};
+const CAUTION_N = 10, MIN_N = 5;
+
+const FILTERS = [
+  {key:'dept', label:'部門'},
+  {key:'pos',  label:'職位', order:['一般職','チームリーダー','管理職']},
+  {key:'sex',  label:'性別', order:['男性','女性']},
+  {key:'age',  label:'年代', fmt:v=>v+'代'},
+  {key:'hire', label:'採用区分', order:['新卒採用','中途採用']},
+];
+const state = {};
+FILTERS.forEach(f=>state[f.key]='');
+
+/* ===== util ===== */
+const $ = id=>document.getElementById(id);
+const esc = s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mean = a=>a.length? a.reduce((s,v)=>s+v,0)/a.length : null;
+const f2 = v=>v==null||isNaN(v)?'—':v.toFixed(2);
+const pct = (a,b)=>b? (a/b*100):null;
+const fp = v=>v==null?'—':v.toFixed(1)+'%';
+const sgn = v=>v==null||isNaN(v)?'—':(v>0?'+':v<0?'−':'±')+Math.abs(v).toFixed(2);
+const nums = (rows,fn)=>rows.map(fn).filter(v=>typeof v==='number');
+function freq(rows,key){const m=new Map();rows.forEach(r=>{const v=r[key];if(v==null)return;m.set(v,(m.get(v)||0)+1)});return m;}
+function useStats(rows){const u=rows.filter(r=>r.use==='used').length, n=rows.filter(r=>r.use==='not').length, na=rows.filter(r=>r.use==null).length; return {u,n,na,valid:u+n,rate:pct(u,u+n)};}
+function pearson(x,y){const n=x.length;if(n<3)return null;const mx=mean(x),my=mean(y);let sxy=0,sxx=0,syy=0;for(let i=0;i<n;i++){const a=x[i]-mx,b=y[i]-my;sxy+=a*b;sxx+=a*a;syy+=b*b}return (sxx&&syy)? sxy/Math.sqrt(sxx*syy):null;}
+
+/* ===== filters ===== */
+function applyFilters(skip){return DATA.filter(r=>FILTERS.every(f=>f.key===skip||!state[f.key]||String(r[f.key])===state[f.key]));}
+function valuesFor(f){const s=new Set(DATA.map(r=>r[f.key]).filter(v=>v!=null));let a=[...s];
+  if(f.order) a.sort((x,y)=>f.order.indexOf(x)-f.order.indexOf(y));
+  else if(f.key==='age') a.sort((x,y)=>x-y);
+  else { const c=freq(DATA,f.key); a.sort((x,y)=>c.get(y)-c.get(x)); }
+  return a;}
+const DEPTS = valuesFor(FILTERS[0]);
+function buildFilters(){
+  $('filterRow').innerHTML = FILTERS.map(f=>`<div class="fgroup"><label for="f-${f.key}">${f.label}</label><select id="f-${f.key}" data-k="${f.key}"></select></div>`).join('')
+   + `<div class="fmeta"><div class="count" aria-live="polite">表示中 <b id="nShown">${TOTAL}</b> / ${TOTAL}名</div><button class="btn" type="button" id="resetBtn">条件をリセット</button></div>`;
+  FILTERS.forEach(f=>$('f-'+f.key).addEventListener('change',e=>{state[f.key]=e.target.value;render();}));
+  $('resetBtn').addEventListener('click',()=>{FILTERS.forEach(f=>state[f.key]='');render();});
+}
+function refreshFilterOptions(){
+  FILTERS.forEach(f=>{
+    const base = applyFilters(f.key), c = freq(base,f.key), sel=$('f-'+f.key);
+    sel.innerHTML = `<option value="">すべて（${base.length}）</option>` + valuesFor(f).map(v=>{
+      const lab = f.fmt? f.fmt(v): v; const n=c.get(v)||0;
+      return `<option value="${esc(v)}"${String(v)===state[f.key]?' selected':''}${n===0&&String(v)!==state[f.key]?' disabled':''}>${esc(lab)}（${n}）</option>`;}).join('');
+    sel.value = state[f.key]; sel.classList.toggle('active',!!state[f.key]);
+  });
+}
+
+/* ===== KPI ===== */
+const ALL_SAT = mean(nums(DATA,r=>r.sat)), ALL_INST = mean(nums(DATA,r=>r.inst));
+function diffLine(v,all){ if(v==null) return '—'; const d=v-all; const cls = Math.abs(d)<0.005?'':(d>0?'up':'down');
+  return `全体平均 ${all.toFixed(2)} との差 <span class="${cls}">${sgn(Math.abs(d)<0.005?0:d)}</span>`; }
+function renderKPIs(rows){
+  const n=rows.length, needYes=rows.filter(r=>r.need==='必要性を感じる'||r.need==='強く必要性を感じる').length, needAns=rows.filter(r=>r.need!=null).length;
+  const sat=mean(nums(rows,r=>r.sat)), inst=mean(nums(rows,r=>r.inst)), u=useStats(rows);
+  const card=(l,v,d)=>`<div class="card kpi"><div class="kl">${l}</div><div class="kv">${v}</div><div class="kd">${d}</div></div>`;
+  $('kpis').innerHTML =
+    card('回答者数', `${n}<small>名</small>`, n===TOTAL?'全回答者':`全${TOTAL}名中`) +
+    card('研修の必要性を感じた割合', needAns? `${pct(needYes,needAns).toFixed(1)}<small>%</small>`:'—', `「必要性を感じる」＋「強く必要性を感じる」 ${needYes}名`) +
+    card('平均満足度', sat==null?'—':`${sat.toFixed(2)}<small>/ 5</small>`, diffLine(sat,ALL_SAT)) +
+    card('平均講師評価', inst==null?'—':`${inst.toFixed(2)}<small>/ 5</small>`, diffLine(inst,ALL_INST)) +
+    card('研修内容の活用率', u.valid? `${u.rate.toFixed(1)}<small>%</small>`:'—', `有効回答 ${u.valid}名中 ${u.u}名／未回答 ${u.na}名`);
+}
+
+/* ===== bar helpers ===== */
+function distChart(el, rows, key, cats, colors, denomLabel){
+  const c=freq(rows,key), den=rows.filter(r=>r[key]!=null).length;
+  if(!den){$(el).innerHTML='<div class="empty">該当する回答がありません</div>';return;}
+  const max=Math.max(...cats.map(k=>c.get(k)||0),1);
+  $(el).innerHTML = `<div style="--lw:170px">`+cats.map((k,i)=>{const v=c.get(k)||0,p=pct(v,den);
+    return `<div class="brow"><div class="blabel">${esc(k)}</div><div class="track" data-tip="${esc(k)}<br>${v}名（${p.toFixed(1)}%）／${denomLabel||'分母'} ${den}名"><div class="bar" style="width:${v/max*100}%;background:${colors[i]}"></div></div><div class="bval">${v}名（${p.toFixed(1)}%）</div></div>`;}).join('')+`</div>`;
+}
+function zeroNote(el,key,cats){const c=freq(DATA,key);const z=cats.filter(k=>!c.get(k));
+  $(el).textContent = z.length? `※「${z.join('」「')}」はデータ上0件の段階です（5段階表示のため設定した段階名で、調査票の表記とは異なる可能性があります）。`:'';}
+
+function renderDept(rows){
+  const present = DEPTS.filter(d=>rows.some(r=>r.dept===d));
+  if(!present.length){$('deptChart').innerHTML='<div class="empty">該当する回答がありません</div>';return;}
+  $('deptChart').innerHTML = `<div style="--lw:150px">`+present.map(d=>{
+    const g=rows.filter(r=>r.dept===d), s=mean(nums(g,r=>r.sat)), t=mean(nums(g,r=>r.inst));
+    const row=(lab,v,col)=>`<div class="sbrow"><div class="sl">${lab}</div><div class="track" data-tip="${esc(d)}（n=${g.length}）<br>${lab} 平均 ${f2(v)}"><div class="bar" style="width:${v/5*100}%;background:${col}"></div></div><div class="bval" style="min-width:0">${f2(v)}</div></div>`;
+    return `<div class="bgroup"><div class="gl"><span>${esc(d)} <span class="n" style="color:var(--muted);font-size:11.5px">n=${g.length}</span></span></div>${row('満足度',s,'var(--s1)')}${row('講師評価',t,'var(--s2)')}</div>`;}).join('')+`</div><div class="foot">軸は0〜5。</div>`;
+}
+
+function renderDonut(rows){
+  const u=useStats(rows), R=62, r=40, C=2*Math.PI;
+  let svg;
+  const W=160;
+  if(!u.valid){ svg=`<svg width="${W}" height="${W}" viewBox="0 0 160 160" role="img" aria-label="有効回答なし"><circle cx="80" cy="80" r="${(R+r)/2}" fill="none" stroke="var(--grid)" stroke-width="${R-r}"/><text x="80" y="80" text-anchor="middle" font-size="13" fill="var(--muted)">有効回答なし</text><text x="80" y="100" text-anchor="middle" font-size="11" fill="var(--muted)">未回答 ${u.na}名</text></svg>`; }
+  else{
+    const arc=(a0,a1,col,tip)=>{ if(a1-a0>=C-1e-6) return `<circle cx="80" cy="80" r="${(R+r)/2}" fill="none" stroke="${col}" stroke-width="${R-r}" data-tip="${tip}"/>`;
+      const gap = 0.025; a0+=gap/2; a1-=gap/2;
+      const p=(rad,a)=>[80+rad*Math.sin(a),80-rad*Math.cos(a)]; const L=a1-a0>Math.PI?1:0;
+      const [x0,y0]=p(R,a0),[x1,y1]=p(R,a1),[x2,y2]=p(r,a1),[x3,y3]=p(r,a0);
+      return `<path d="M${x0} ${y0}A${R} ${R} 0 ${L} 1 ${x1} ${y1}L${x2} ${y2}A${r} ${r} 0 ${L} 0 ${x3} ${y3}Z" fill="${col}" data-tip="${tip}"/>`;};
+    const a=u.u/u.valid*C;
+    svg = `<svg width="${W}" height="${W}" viewBox="0 0 160 160" role="img" aria-label="活用率 ${u.rate.toFixed(1)}%">`
+      + (u.u? arc(0,a,'var(--s1)',`活用した ${u.u}名（${u.rate.toFixed(1)}%）`):'')
+      + (u.n? arc(a,C,'var(--s2)',`活用していない ${u.n}名（${(100-u.rate).toFixed(1)}%）`):'')
+      + `<text x="80" y="78" text-anchor="middle" font-size="22" font-weight="700" fill="var(--ink)">${u.rate.toFixed(1)}%</text>`
+      + `<text x="80" y="96" text-anchor="middle" font-size="10.5" fill="var(--muted)">活用率</text>`
+      + `<text x="80" y="111" text-anchor="middle" font-size="10.5" fill="var(--muted)">未回答 ${u.na}名</text></svg>`;
+  }
+  $('donut').innerHTML = `<div class="donutwrap">${svg}<div class="dlegend">
+    <div><i style="background:var(--s1)"></i>活用した<span class="v">${u.u}名${u.valid?`（${u.rate.toFixed(1)}%）`:''}</span></div>
+    <div><i style="background:var(--s2)"></i>活用していない<span class="v">${u.n}名${u.valid?`（${(100-u.rate).toFixed(1)}%）`:''}</span></div>
+    <div style="color:var(--muted)">有効回答 ${u.valid}名</div></div></div>`;
+}
+
+/* ===== engagement ===== */
+function renderEngAvg(rows){
+  if(!rows.length){$('engAvg').innerHTML='<div class="empty">該当する回答がありません</div>';return;}
+  const items = ENG.map((q,i)=>({q,v:mean(nums(rows,r=>r.e[i])),n:nums(rows,r=>r.e[i]).length})).sort((a,b)=>b.v-a.v);
+  $('engAvg').innerHTML = `<div style="--lw:190px">`+items.map(it=>`<div class="brow"><div class="blabel">${esc(it.q)}</div><div class="track" data-tip="${esc(it.q)}<br>平均 ${f2(it.v)}（n=${it.n}）"><div class="bar" style="width:${it.v/5*100}%;background:var(--s1)"></div></div><div class="bval" style="min-width:36px">${f2(it.v)}</div></div>`).join('')+`</div><div class="foot">軸は0〜5。n=${rows.length}</div>`;
+}
+let sortB='q';
+function renderEngByUse(rows){
+  const U=rows.filter(r=>r.use==='used'), N=rows.filter(r=>r.use==='not'), na=rows.filter(r=>r.use==null).length;
+  $('legB').innerHTML = `<span><i style="background:var(--s1)"></i>活用した（n=${U.length}）</span><span><i style="background:var(--s2)"></i>活用していない（n=${N.length}）</span><span style="color:var(--muted)">未回答 ${na}名は除外</span>`;
+  const ok = U.length>=MIN_N && N.length>=MIN_N;
+  let items = ENG.map((q,i)=>{const a=nums(U,r=>r.e[i]),b=nums(N,r=>r.e[i]);const ma=mean(a),mb=mean(b);return {q,i,ma,mb,na:a.length,nb:b.length,d:(ma!=null&&mb!=null)?ma-mb:null};});
+  if(ok && sortB==='d') items.sort((x,y)=>y.d-x.d);
+  const bar=(lab,v,n,col,q)=> n<MIN_N
+    ? `<div class="sbrow"><div class="sl">${lab}</div><div class="insufficient">n不足（n=${n}）</div><div></div></div>`
+    : `<div class="sbrow"><div class="sl">${lab}</div><div class="track" data-tip="${esc(q)}<br>${lab}：平均 ${f2(v)}（n=${n}）"><div class="bar${n<CAUTION_N?' faded':''}" style="width:${v/5*100}%;background:${col}"></div></div><div class="bval" style="min-width:0">${f2(v)}</div></div>`;
+  $('engByUse').innerHTML = items.map(it=>`<div class="bgroup"><div class="gl"><span>${esc(it.q)}</span><span class="diff">差 ${ok?sgn(it.d):'—'}</span></div>${bar('活用した',it.ma,it.na,'var(--s1)',it.q)}${bar('活用していない',it.mb,it.nb,'var(--s2)',it.q)}</div>`).join('')
+    + `<div class="foot">軸は0〜5。${!ok?'いずれかの群が n&lt;5 のため差は表示していません。':'n&lt;10 の群は薄色で表示しています。'}</div>`;
+}
+let selC=0;
+function renderEngLevel(rows){
+  const groups=[{l:'低（1–2）',f:v=>v<=2},{l:'中（3）',f:v=>v===3},{l:'高（4–5）',f:v=>v>=4}];
+  const out = groups.map(g=>{const gr=rows.filter(r=>typeof r.e[selC]==='number'&&g.f(r.e[selC]));const s=useStats(gr);return {...g,s,all:gr.length};});
+  $('engLevel').innerHTML = `<div style="--lw:96px">`+out.map(g=>{
+    const s=g.s; let mid, val;
+    if(s.valid<MIN_N){ mid=`<div class="insufficient">n不足</div>`; val=`n=${s.valid}`; }
+    else { mid=`<div class="track" data-tip="${esc(ENG[selC])}：${g.l}<br>活用率 ${fp(s.rate)}（${s.u}/${s.valid}名）<br>未回答 ${s.na}名"><div class="bar${s.valid<CAUTION_N?' faded':''}" style="width:${s.rate}%;background:var(--s1)"></div></div>`; val=`${fp(s.rate)}（n=${s.valid}）`; }
+    return `<div class="brow"><div class="blabel">${g.l}<br><span class="n">${s.na?`未回答 ${s.na}名`:''}</span>${s.valid>=MIN_N&&s.valid<CAUTION_N?'<br><span class="tag" style="margin-left:0">参考値（少数）</span>':''}</div>${mid}<div class="bval" style="min-width:96px">${val}</div></div>`;}).join('')+`</div><div class="foot">軸は0〜100%。活用率＝活用した÷（活用した＋活用していない）。</div>`;
+}
+function renderCorr(rows){
+  const V=rows.filter(r=>r.use!=null), y=V.map(r=>r.use==='used'?1:0);
+  const nU=y.filter(v=>v).length, nN=y.length-nU, ok = nU>=MIN_N && nN>=MIN_N;
+  const vars = ENG.map((q,i)=>({q,fn:r=>r.e[i]})).concat([{q:'研修の満足度',fn:r=>r.sat},{q:'講師評価',fn:r=>r.inst}]);
+  const body = vars.map(v=>{const xs=[],ys=[];V.forEach(r=>{const x=v.fn(r);if(typeof x==='number'){xs.push(x);ys.push(r.use==='used'?1:0);}});
+    const r= ok? pearson(xs,ys):null;
+    const vis = r==null? '' : `<div class="rbar"><div class="mid"></div><div class="b" style="background:${r>=0?'var(--s1)':'var(--s2)'};${r>=0?`left:50%;width:${r*50}%`:`left:${50+r*50}%;width:${-r*50}%`}"></div></div>`;
+    return `<tr><td>${esc(v.q)}</td><td class="num">${!ok?'n不足':(r==null?'—':(r<0?'−':'')+Math.abs(r).toFixed(2))}</td><td>${vis}</td><td class="num">${xs.length}</td></tr>`;}).join('');
+  $('corrTable').innerHTML = `<div style="overflow-x:auto"><table class="ctable"><thead><tr><th>項目</th><th class="num">r</th><th style="min-width:130px">−1　　　0　　　+1</th><th class="num">n</th></tr></thead><tbody>${body}</tbody></table></div><div class="foot">活用した n=${nU}／活用していない n=${nN}（未回答 ${rows.length-V.length}名は除外）。小数第2位まで表示。</div>`;
+}
+
+/* ===== table ===== */
+const ORD = {need:NEED,useful:USEFUL,level:LEVEL,time:TIME,deg:DEG,pos:FILTERS[1].order,use:['used','not']};
+const COLS = [
+  {k:'id',l:'No.',num:1},{k:'dept',l:'部門'},{k:'pos',l:'職位'},{k:'sex',l:'性別'},{k:'age',l:'年代',fmt:v=>v+'代',num:1},{k:'hire',l:'採用区分'},
+  {k:'sat',l:'満足度',num:1},{k:'inst',l:'講師評価',num:1},{k:'need',l:'必要度'},{k:'useful',l:'有用度'},{k:'level',l:'レベル'},{k:'time',l:'研修時間'},
+  {k:'use',l:'活用有無',fmt:v=>USE_LABEL[v]},{k:'deg',l:'活用結果の程度'},
+  {k:'good',l:'成果コメント',free:1,get:r=>r.use==='used'?r.text:null},{k:'why',l:'未活用の理由',free:1,get:r=>r.use==='not'?r.text:null},
+];
+let tsort={k:'id',dir:1};
+function cellVal(r,c){return c.get? c.get(r): r[c.k];}
+function renderTable(rows){
+  const c=COLS.find(x=>x.k===tsort.k);
+  const key=r=>{const v=cellVal(r,c); if(v==null) return null; if(ORD[c.k]) return ORD[c.k].indexOf(v); return v;};
+  const sorted=[...rows].sort((a,b)=>{const x=key(a),y=key(b); if(x==null&&y==null) return a.id-b.id; if(x==null) return 1; if(y==null) return -1;
+    const d = (typeof x==='number'&&typeof y==='number')? x-y : String(x).localeCompare(String(y),'ja'); return d? d*tsort.dir : a.id-b.id;});
+  const head = '<thead><tr>'+COLS.map(c=>`<th class="${c.num?'num':''}" aria-sort="${tsort.k===c.k?(tsort.dir>0?'ascending':'descending'):'none'}"><button type="button" data-k="${c.k}">${c.l}<span class="arr">${tsort.k===c.k?(tsort.dir>0?'▲':'▼'):''}</span></button></th>`).join('')+'</tr></thead>';
+  const body = sorted.length? sorted.map(r=>'<tr>'+COLS.map(c=>{const v=cellVal(r,c);
+      if(v==null){ const t = c.k==='use'?'未回答':'—'; return `<td class="${c.free?'free ':''}na">${t}</td>`; }
+      return `<td class="${c.num?'num':''}${c.free?' free':''}">${esc(c.fmt?c.fmt(v):v)}</td>`;}).join('')+'</tr>').join('')
+    : `<tr><td colspan="${COLS.length}" class="na">該当する回答がありません</td></tr>`;
+  $('detail').innerHTML = head+'<tbody>'+body+'</tbody>';
+  $('detail').querySelectorAll('th button').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.k; tsort = tsort.k===k? {k,dir:-tsort.dir}:{k,dir:1}; renderTable(applyFilters());}));
+}
+
+/* ===== main ===== */
+function render(){
+  const rows=applyFilters();
+  refreshFilterOptions();
+  $('nShown').textContent=rows.length;
+  renderKPIs(rows); renderDept(rows);
+  distChart('distNeed',rows,'need',NEED,SEQ,'表示中');
+  distChart('distUseful',rows,'useful',USEFUL,SEQ,'表示中');
+  distChart('distLevel',rows,'level',LEVEL,DIV,'表示中');
+  distChart('distTime',rows,'time',TIME,DIV,'表示中');
+  renderDonut(rows);
+  distChart('distDeg',rows.filter(r=>r.use==='used'),'deg',DEG,SEQ,'「活用した」');
+  renderEngAvg(rows); renderEngByUse(rows); renderEngLevel(rows); renderCorr(rows); renderTable(rows);
+}
+
+$('surveyDate').textContent = SURVEY_DATE? `調査日：${SURVEY_DATE}` : '調査日：未設定';
+zeroNote('noteNeed','need',NEED); zeroNote('noteUseful','useful',USEFUL);
+$('selC').innerHTML = ENG.map((q,i)=>`<option value="${i}">${esc(q)}</option>`).join('');
+$('selC').addEventListener('change',e=>{selC=+e.target.value;renderEngLevel(applyFilters());});
+$('sortB').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;sortB=b.dataset.v;$('sortB').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderEngByUse(applyFilters());});
+buildFilters(); render();
+
+/* tooltip */
+const tip=$('tip');
+document.addEventListener('mousemove',e=>{const t=e.target.closest&&e.target.closest('[data-tip]');
+  if(!t){tip.classList.remove('on');return;}
+  tip.innerHTML=t.getAttribute('data-tip'); tip.classList.add('on');
+  const w=tip.offsetWidth,h=tip.offsetHeight; let x=e.clientX+14,y=e.clientY+14;
+  if(x+w>innerWidth-8) x=e.clientX-w-14; if(y+h>innerHeight-8) y=e.clientY-h-14;
+  tip.style.left=x+'px'; tip.style.top=y+'px';});
+document.addEventListener('scroll',()=>tip.classList.remove('on'),true);
+
+/* theme */
+const THEMES=['auto','light','dark'], TL={auto:'自動',light:'ライト',dark:'ダーク'};
+let theme='auto'; try{theme=localStorage.getItem('lsd-theme')||'auto';}catch(e){}
+function applyTheme(){ if(theme==='auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme',theme); $('themeBtn').textContent='テーマ：'+TL[theme]; }
+$('themeBtn').addEventListener('click',()=>{theme=THEMES[(THEMES.indexOf(theme)+1)%3];try{localStorage.setItem('lsd-theme',theme);}catch(e){}applyTheme();});
+applyTheme();
+</script>
+</body>
+</html>

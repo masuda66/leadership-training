@@ -1,0 +1,15 @@
+# OS / editor
+Thumbs.db
+desktop.ini
+.DS_Store
+~$*
+*.tmp
+
+# Secrets
+.env
+.env.*
+*.key
+*.pem
+
+# Claude Code local settings
+.claude/settings.local.json
